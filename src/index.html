@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <meta name = "viewport" content = "user-scalable=no, width=device-width, minimum-scale=1, maximum-scale=2">
+    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
+    <style>
+     body {
+       overflow: hidden;
+       margin: 0px;
+       padding: 0px;
+     }
+
+     #input {
+       position: fixed;
+       padding: 0px;
+       margin: 0px;
+       bottom: 0px;
+       width: 100%;
+       display: flex;
+     }
+
+     #input > input {
+       padding: 10px;
+       margin: 10px;
+       flex-grow: 1;
+     }
+
+     #canvas {
+       position: absolute;
+       user-select: none;
+     }
+
+     .chunk {
+       position: absolute;
+       width: 1000px;
+       height: 1000px;
+       border-style: solid;
+       border-width: 1px;
+       border-color: Gray;
+       user-select: none;
+     }
+
+     .chunkLabel {
+       position: relative;
+       top: -5px;
+       left: 10px;
+       color: lightGray;
+     }
+
+     .messageContainer {
+       position: absolute;
+       width: 800px;
+     }
+
+     .message {
+       user-select: text;
+       width: auto;
+       display: inline-block;
+     }
+    </style>
+  </head>
+  <body>
+    <script src="./index.tsx"></script>
+  </body>
+</html>

@@ -4,6 +4,7 @@ import PouchDB from "pouchdb-browser";
 
 import { EventManager1 } from "./eventManager";
 import { draw } from "./index";
+import { target } from "./input";
 import { fetchMessages, loadedChunks, loadedMessages, unpinMessage } from "./dbManager";
 import { onFrame } from "./animationManager";
 import { Position } from "./utils";
@@ -50,6 +51,7 @@ function updateCanvasPosition(x: number, y: number) {
   }
 }
 
+let tapped: boolean = false;
 function pointerEvent(e: PointerEvent) {
   mouseX = e.x;
   mouseY = e.y;
@@ -61,6 +63,16 @@ function pointerEvent(e: PointerEvent) {
   } else if (e.pointerType == "touch" || e.pointerType == "pen") {
     if (e.isPrimary) {
       newDown = (e.buttons & 1) == 1;
+
+      if (newDown) {
+        if (!currentDown) {
+          tapped = true;
+          setTimeout(() => {tapped = false;}, 100);
+        }
+      } else if (tapped)  {
+        tapped = false;
+        target(mouseX - canvasX, mouseY - canvasY);
+      }
     }
   }
 
@@ -101,8 +113,7 @@ onFrame.Subscribe(() => {
 function drawMessage(messageData: MessageData) {
   if (messageData != undefined) {
     let messageStyle = {
-      left: messageData.x,
-      top: messageData.y
+      transform: `translate(${messageData.x}px, ${messageData.y}px)`
     };
 
     function click(e: MouseEvent) {
@@ -127,8 +138,7 @@ function drawMessage(messageData: MessageData) {
 
 function drawChunk(chunk: Position) {
   let chunkStyle = {
-    left: chunk.x * 1000,
-    top: chunk.y * 1000
+    transform: `translate(${chunk.x * 1000}px, ${chunk.y * 1000}px)`
   };
 
   return <div class="chunk"
@@ -144,19 +154,23 @@ export async function drawCanvas() {
   }
 
   let canvasStyle = {
-    left: canvasX,
-    top: canvasY,
+    transform: `translate(${canvasX}, ${canvasY})`
   }
 
   var token: number;
   function create(vnode: m.Vnode)  {
     token = positionUpdated.Subscribe(() => {
-      vnode.dom.style = `left: ${canvasX}; top: ${canvasY};`:
+      vnode.dom.style = `transform: translate(${canvasX}px, ${canvasY}px);`:
     });
   }
 
   function remove(vnode: m.Vnode) {
     positionUpdated.Unsubscribe(token);
+  }
+
+  function context(e: Event) {
+    target(mouseX - canvasX, mouseY - canvasY);
+    e.preventDefault();
   }
 
   return <div id="canvas"
@@ -165,6 +179,7 @@ export async function drawCanvas() {
               onpointerdown={pointerEvent}
               onpointerup={pointerEvent}
               onpointermove={pointerEvent}
+              oncontextmenu={context}
               oncreate={create}
               onremove={remove}>
     {loadedChunks.map(drawChunk)}

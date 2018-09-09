@@ -1,1 +1,1 @@
-dev: parcel
+dev: parcel src/index.html
